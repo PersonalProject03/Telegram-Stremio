@@ -62,6 +62,8 @@ _DEFAULTS: Dict[str, Any] = {
     "fanart_shuffle": False,
     "fanart_shuffle_interval": 5,
     "fanart_low_res_poster": True,
+    "use_cf_tunnel": False,
+    "cf_tunnel_token": "",
 }
 
 
@@ -88,6 +90,8 @@ def _seed_from_env() -> Dict[str, Any]:
         "show_proxy_and_non_proxy_both": Telegram.SHOW_PROXY_AND_NON_PROXY_BOTH,
         "multi_tokens":                 [],
         "extra_databases":              list(Telegram.DATABASE[2:]) if len(Telegram.DATABASE) > 2 else [],
+        "use_cf_tunnel":                getattr(Telegram, "USE_CF_TUNNEL", False),
+        "cf_tunnel_token":              getattr(Telegram, "CF_TUNNEL_TOKEN", "") or "",
     })
     return seed
 
@@ -181,6 +185,14 @@ class Settings:
     @property
     def base_url(self) -> str:
         return str(self._d.get("base_url") or "").rstrip("/")
+
+    @property
+    def use_cf_tunnel(self) -> bool:
+        return bool(self._d.get("use_cf_tunnel", False))
+
+    @property
+    def cf_tunnel_token(self) -> str:
+        return str(self._d.get("cf_tunnel_token") or "").strip()
 
     @property
     def upstream_repo(self) -> str:

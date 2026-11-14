@@ -324,7 +324,28 @@
                 <input type="url" id="base_url" class="s-input"
                     value="{{ settings.base_url }}"
                     placeholder="https://your-domain.com">
+                <p class="field-hint">Auto-updated when Cloudflare Tunnel is active, or enter a custom URL manually.</p>
             </div>
+        </div>
+        <hr class="divider">
+        <div class="card-heading" style="margin-bottom:0.75rem;">☁️ Cloudflare Tunnel</div>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+            <div>
+                <div style="font-weight:600; font-size:0.95rem;">Enable Cloudflare Tunnel</div>
+                <div class="field-hint">Automatically expose this server via Cloudflare and set Base URL.</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="use_cf_tunnel" {% if settings.use_cf_tunnel %}checked{% endif %}>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        <div>
+            <label class="s-label" for="cf_tunnel_token">Cloudflare Tunnel Token (Optional)</label>
+            <input type="password" id="cf_tunnel_token" class="s-input"
+                value="{{ settings.cf_tunnel_token }}"
+                placeholder="Leave blank for free Quick Tunnel (*.trycloudflare.com)" autocomplete="off">
+            <p class="field-hint">If blank, an ephemeral Quick Tunnel is created automatically at boot. If you provide a token for a Named Tunnel, also make sure your Base URL is set to your custom domain.</p>
+        </div>
         </div>
         <hr class="divider">
         <div class="grid-2">
@@ -1699,6 +1720,8 @@ async function saveSettings() {
         tmdb_api:                      document.getElementById('tmdb_api').value.trim(),
         tvdb_api:                      (document.getElementById('tvdb_api') || {}).value?.trim() || '',
         base_url:                      document.getElementById('base_url').value.trim(),
+        use_cf_tunnel:                 document.getElementById('use_cf_tunnel').checked,
+        cf_tunnel_token:               (document.getElementById('cf_tunnel_token') || {}).value?.trim() || '',
         better_poster_enabled:         document.getElementById('better_poster_enabled').checked,
         better_poster:                 document.getElementById('better_poster').value.trim(),
         rpdb_enabled:                  document.getElementById('rpdb_enabled').checked,
@@ -1860,6 +1883,8 @@ function renderSettings(s) {
     document.getElementById('tmdb_api').value = s.tmdb_api || '';
     if (document.getElementById('tvdb_api')) document.getElementById('tvdb_api').value = s.tvdb_api || '';
     document.getElementById('base_url').value = s.base_url || '';
+    if (document.getElementById('use_cf_tunnel')) document.getElementById('use_cf_tunnel').checked = !!s.use_cf_tunnel;
+    if (document.getElementById('cf_tunnel_token')) document.getElementById('cf_tunnel_token').value = s.cf_tunnel_token || '';
     document.getElementById('better_poster_enabled').checked = !!s.better_poster_enabled;
     document.getElementById('better_poster').value = s.better_poster || '';
     document.getElementById('rpdb_enabled').checked = !!s.rpdb_enabled;

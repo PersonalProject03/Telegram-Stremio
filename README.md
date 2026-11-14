@@ -56,6 +56,7 @@
   * [🐙 Heroku](#-heroku-guide)
   * [🐳 VPS (recommended)](#-vps-guide-recommended)
   * [🆓 Koyeb / Render / orkestr (free)](#-free-hosting-koyeb-render-orkestr)
+  * [🌐 Cloudflare Tunnel (auto Base URL & public access)](#-cloudflare-tunnel-auto-base-url--public-access)
   * [☁️ Cloudflare streaming (optional)](#️-cloudflare-streaming-optional)
 * [📺 Watch in Nuvio / Stremio](#-watch-in-nuvio--stremio)
 * [🏅 Contributors](#-contributors)
@@ -971,6 +972,27 @@ orkestr (EU-hosted, free Starter plan) has no one-click button yet, so connect t
 4. Deploy, copy the project's public URL, open `<url>/login` and set **Settings → Base URL** to it.
 
 > ℹ️ orkestr's free plan also sleeps when idle and includes 100 GB of bandwidth a month.
+
+## 🌐 Cloudflare Tunnel (auto Base URL & public access)
+
+Telestream has built-in Cloudflare Tunnel support (`cloudflared`). It allows you to expose your instance to the internet without opening router/firewall ports, bypassing CGNAT and firewalls.
+
+When enabled, Telestream **automatically detects your tunnel URL** and updates the **Base URL** in your database, ensuring your public request page (`/request`), admin dashboard (`/admin/requests`), and Stremio streaming links work instantly.
+
+### How to use:
+1. **Via Web Admin Panel**:
+   - Go to **Settings → ☁️ Cloudflare Tunnel**.
+   - Toggle **Enable Cloudflare Tunnel** to `ON`.
+   - *(Optional)* Enter your `Cloudflare Tunnel Token` if using a Named Tunnel with a custom domain, or leave blank to use a free **Quick Tunnel** (`*.trycloudflare.com`).
+   - Click **Save**.
+
+2. **Via `config.env`**:
+   ```env
+   USE_CF_TUNNEL=true
+   CF_TUNNEL_TOKEN=   # Optional: leave blank for automatic *.trycloudflare.com URL
+   ```
+
+At startup, the tunnel URL is logged to your console and set as your live Base URL.
 
 ## ☁️ Cloudflare streaming (optional)
 

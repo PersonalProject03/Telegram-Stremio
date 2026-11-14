@@ -7,9 +7,11 @@ from pyrogram import idle
 from starlette.middleware.sessions import SessionMiddleware
 
 from Backend import __version__, db
+from Backend.config import Telegram
 from Backend.fastapi import server
 from Backend.fastapi.main import app
 from Backend.helper import subscription_task_manager
+from Backend.helper.cf_tunnel import start_cloudflare_tunnel, stop_cloudflare_tunnel
 from Backend.helper.link_checker import DeadLinkChecker
 from Backend.helper.pinger import ping
 from Backend.helper.pyro import restart_notification, setup_bot_commands
@@ -76,6 +78,26 @@ async def start_services():
         LOGGER.info('Initializing Telegram-Stremio Web Server...')
         await restart_notification()
         loop.create_task(server.serve())
+
+        #----- Cloudflare Tunnel initialization
+        current_settings = SettingsManager.current()
+        if current_settings.use_cf_tunnel:
+            LOGGER.info("Cloudflare Tunnel is enabled. Initializing tunnel...")
+            tunnel_url = await start_cloudflare_tunnel(
+                port=Telegram.PORT,
+                tunnel_token=current_settings.cf_tunnel_token,
+                custom_url=current_settings.base_url,
+            )
+            if tunnel_url:
+                if current_settings.base_url != tunnel_url:
+                    LOGGER.info(f"Auto-updating base_url in database to Cloudflare URL: {tunnel_url}")
+                    await SettingsManager.update(db, {"base_url": tunnel_url})
+                LOGGER.info(f"🔗 Cloudflare Tunnel Base URL: {tunnel_url}")
+                LOGGER.info(f"🔗 Admin Requests Dashboard: {tunnel_url}/admin/requests")
+                LOGGER.info(f"🔗 Public Content Request:  {tunnel_url}/request")
+            else:
+                LOGGER.warning("Cloudflare tunnel failed to produce a valid URL.")
+
         loop.create_task(ping())
 
         link_checker_task = DeadLinkChecker(db, app, check_interval_hours=24)
@@ -103,6 +125,7 @@ async def stop_services():
         if botmod.Userbot is not None:
             await botmod.Userbot.stop()
 
+        await stop_cloudflare_tunnel()
         await db.disconnect()
         LOGGER.info("Services stopped successfully.")
     except Exception:

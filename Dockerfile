@@ -15,6 +15,8 @@ RUN apt-get update && \
         ca-certificates \
         locales && \
     locale-gen en_US.UTF-8 && \
+    curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /usr/local/bin/cloudflared && \
+    chmod +x /usr/local/bin/cloudflared && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

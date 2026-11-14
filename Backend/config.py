@@ -46,3 +46,7 @@ class Telegram:
     #----- WebDAV (optional env fallback; prefer Settings page)
     WEBDAV_USER     = getenv("WEBDAV_USER", "")
     WEBDAV_PASSWORD = getenv("WEBDAV_PASSWORD", "")
+
+    #----- Cloudflare Tunnel
+    USE_CF_TUNNEL      = getenv("USE_CF_TUNNEL", "false").lower() == "true"
+    CF_TUNNEL_TOKEN    = getenv("CF_TUNNEL_TOKEN", "")
